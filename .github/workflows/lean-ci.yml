@@ -1,0 +1,52 @@
+name: Build and audit Lean
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lean-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and audit Lean
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      LEAN_NUM_THREADS: "2"
+      MATHLIB_NO_CACHE_ON_UPDATE: "1"
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Audit source and root import closure
+        run: python3 -c "from scripts.audit_source import check_lean; check_lean()"
+      - name: Install the pinned Lean toolchain
+        uses: leanprover/lean-action@50fcf42d2e460296f1a34b402e990d1b24f8b596 # v1
+        with:
+          auto-config: "false"
+          build: "false"
+          test: "false"
+          lint: "false"
+          use-github-cache: "false"
+          use-mathlib-cache: "false"
+      - name: Fetch pinned dependency cache
+        run: |
+          python3 scripts/fetch_mathlib_cache.py
+          git diff --exit-code -- lean-toolchain lakefile.toml lake-manifest.json
+      - name: Build every project proof
+        run: lake build
+      - name: Audit source, coverage, and declaration references
+        run: python3 scripts/audit_source.py
+      - name: Audit every declaration's transitive axioms
+        run: lake env lean scripts/audit_lean.lean
+      - name: Elaborate statement-correspondence inspection
+        run: lake env lean scripts/statement_audit.lean
