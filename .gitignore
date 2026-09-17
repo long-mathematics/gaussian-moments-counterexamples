@@ -12,3 +12,7 @@ build/
 *.synctex.gz
 *.toc
 
+.lake/
+*.olean
+*.ilean
+*.trace

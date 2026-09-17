@@ -20,16 +20,31 @@
 - Finite computational checks are diagnostics, not proofs of the manuscript's
   all-moment coefficient identities or a full formalization of the paper.
 
-## Future Lean formalization
+## Lean formalization
 
-- Use a root Lake project and a `GaussianMomentsCounterexamples/` module directory;
+- Maintain the root Lake project and `GaussianMomentsCounterexamples/` module directory;
   do not create a separate `formalization/` subtree.
 - Put the umbrella module at `GaussianMomentsCounterexamples.lean`, auxiliary Lean
   audits in `scripts/`, and the coverage ledger at `FORMALIZATION_STATUS.md`.
 - Never introduce `sorry`, `admit`, custom axioms, or hypotheses that assume the
   conclusion. Audit transitive dependencies as well as source text.
-- Distinguish proved, partial, unverified, and missing claims. Do not claim full-paper
-  coverage before statement correspondence and transitive-axiom audits are complete.
+- Keep the pinned Lean/mathlib versions and dependency manifest unless a change is justified.
+- Run `lake build`, `python3 scripts/audit_source.py`,
+  `lake env lean scripts/audit_lean.lean`, and `lake env lean scripts/statement_audit.lean`.
+  For final validation, rebuild owned modules with only dependency caches retained.
+- The axiom audit must select declarations by originating module, including private
+  and generated declarations, and allow only `propext`, `Classical.choice`, `Quot.sound`.
+- Distinguish proved, partial, missing, and blocked claims in the structured ledger.
+  Keep declaration references, dependency links, and root imports current.
+- Core results use actual integrable complex polynomials under product Gaussian
+  measures. Preserve the integral bridge, arbitrary-polynomial master identities,
+  eventual-vanishing quantifiers, and natural-coordinate support conventions.
+- Formal generating functions are coefficientwise identities. Do not reinterpret
+  them as analytic exponential integrals.
+- Direct failure of GMC(158) by dimension extension does not establish the separate
+  Jacobian-reduction route. Arithmetic bounds do not establish its transformations.
+- Do not claim full-paper coverage before statement correspondence and transitive
+  axiom audits are complete. Supporting omissions must remain explicit.
 
 ## Git workflow
 
