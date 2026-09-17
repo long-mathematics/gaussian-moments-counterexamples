@@ -1,0 +1,5 @@
+Exact finite moment checks passed for both GMC examples.
+Announced map: det(JF)=1 and the stated collision is exact.
+High-degree support counts: {4: 3, 5: 2, 6: 2, 7: 1}
+BCW degree-lowering steps <= 18; degree <= 3 dimension s = 39.
+Cubic-homogeneous dimension r = 79; fixed-dimensional DVEZ/Zhao gives not GMC(158).

@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "Please cite the accompanying paper."
+title: "Small Counterexamples to the Gaussian Moments Conjecture"
+type: article
+authors:
+  - family-names: Long
+    given-names: Christopher D.
+doi: 10.48550/arXiv.2607.18186
+url: https://arxiv.org/abs/2607.18186
+repository-code: https://github.com/long-mathematics/gaussian-moments-counterexamples
+license: MIT
+

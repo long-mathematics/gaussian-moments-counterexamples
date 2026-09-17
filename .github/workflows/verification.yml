@@ -1,0 +1,51 @@
+name: Build paper and verify identities
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verification-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify exact identities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install pinned Python dependencies
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install -r scripts/requirements.txt
+      - name: Run exact checks and compare reference output
+        run: .venv/bin/python scripts/check_verification.py
+
+  paper:
+    name: Build manuscript
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends latexmk texlive-latex-extra texlive-fonts-recommended lmodern
+      - name: Compile manuscript
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build gaussian_moments_counterexamples.tex
+          if grep -E 'undefined|LaTeX Warning:|Overfull' build/gaussian_moments_counterexamples.log; then
+            exit 1
+          fi
+
